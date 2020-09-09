@@ -8,14 +8,16 @@ const documentRoot = 'C:\\Code\\exp';
 
 const app = express();
 
+// 处理静态资源请求
 app.use('/static', express.static(documentRoot));
-app.use('/static', serveIndex(documentRoot));
 
+// 处理目录读取
 app.use('/file', (req, res) => {
   // 访问 /file/document 相当于要访问根目录下的 /document
   const requestPath = req.path;
   const visitPath = path.join(documentRoot, requestPath.replace(/^\/file/, ''));
 
+  // TODO: 使用 async await + pify 的形式来实现
   fs.stat(visitPath, (err, stats) => {
     if (err) {
       res.statusCode = 500;
@@ -33,22 +35,26 @@ app.use('/file', (req, res) => {
       });
     }
     else {
-      const extName = path.extname(visitPath);
-      if (['.gif', '.jpg', '.png'].find(x => extName.toLowerCase() === x)) {
-        res.setHeader('Content-Type', 'image/' + extName.slice(1));
-      }
-      else {
-        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(path.basename(visitPath))}"`);
-      }
-      res.statusCode = 200;
-      fs.createReadStream(visitPath).pipe(res);
+      res.json({ code: 9001, message: 'Not a directory' });
     }
   });
 });
 
+app.use('/sync', (req, res) => {
+  const start = +new Date();
+  while(+new Date() - start < 10000) {}
+  res.send('finish');
+});
+
+app.use('/async', (req, res) => {
+  setTimeout(() => res.send('finish'), 10000);
+});
+
+// 直出前端视图
 app.use((req, res) => {
   res.send('It works');
 });
+
 
 app.listen(9527);
 console.log('Server is listening in http://127.0.0.1:9527');
