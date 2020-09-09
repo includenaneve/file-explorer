@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path, { extname } from 'path';
 import http from 'http';
-import url from 'url';
+import express from 'express';
 
 const documentRoot = 'C:\\Code\\exp';
 
-const server = http.createServer((req, res) => {
+const app = express();
 
+app.use((req, res) => {
   const visitPath = path.join(documentRoot, decodeURI(req.url || ''));
 
   fs.stat(visitPath, (err, stats) => {
@@ -49,7 +50,8 @@ const server = http.createServer((req, res) => {
       fs.createReadStream(visitPath).pipe(res);
     }
   });
-});
+})
 
-server.listen(9527);
+app.listen(9527);
 console.log('Server is listening in http://127.0.0.1:9527');
+
