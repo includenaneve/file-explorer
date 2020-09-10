@@ -1,43 +1,30 @@
-import fs from 'fs';
-import path, { extname } from 'path';
-import http from 'http';
-import express from 'express';
-import serveIndex from 'serve-index';
-
+const fs = require('fs');
+const path = require('path');
 const documentRoot = 'C:\\Code\\exp';
-
+const express = require('express');
+const pify = require('pify');
 const app = express();
 
 // 处理静态资源请求
 app.use('/static', express.static(documentRoot));
 
 // 处理目录读取
-app.use('/file', (req, res) => {
+app.use('/file', async(req, res) => {
   // 访问 /file/document 相当于要访问根目录下的 /document
   const requestPath = req.path;
   const visitPath = path.join(documentRoot, requestPath.replace(/^\/file/, ''));
-
-  // TODO: 使用 async await + pify 的形式来实现
-  fs.stat(visitPath, (err, stats) => {
-    if (err) {
-      res.statusCode = 500;
-      res.end(err.message);
-      return;
-    }
+  try {
+    const stats = await pify(fs.stat)(visitPath)
     if (stats.isDirectory()) {
-      fs.readdir(visitPath, (err, fileList) => {
-        if (err) {
-          res.statusCode = 500;
-          res.end(err.message);
-          return;
-        }
-        res.json({ code: 0, message: 'ok', data: { fileList } });
-      });
-    }
-    else {
+      const { err, fileList } = await pify(fs.readdir)(visitPath)
+      res.json({ code: 0, message: 'ok', data: { fileList } });
+    } else {
       res.json({ code: 9001, message: 'Not a directory' });
     }
-  });
+  } catch (err) {
+    res.status(500).end(err.massage)
+    return
+  }
 });
 
 app.use('/sync', (req, res) => {
@@ -52,7 +39,7 @@ app.use('/async', (req, res) => {
 
 // 直出前端视图
 app.use((req, res) => {
-  res.send('It works');
+  res.send('It works!!!');
 });
 
 
