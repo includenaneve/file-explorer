@@ -5,10 +5,10 @@ const express = require('express');
 const pify = require('pify');
 const app = express();
 
-// 处理静态资源请求
+// 处理静态资源请求（这里用作文件下载和图片预览中间件）
 app.use('/static', express.static(documentRoot));
 
-// 处理目录读取
+// 处理目录读取 （这里用作api中间件）
 app.use('/file', async(req, res) => {
   // 访问 /file/document 相当于要访问根目录下的 /document
   const requestPath = req.path;
