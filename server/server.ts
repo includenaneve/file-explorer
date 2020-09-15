@@ -1,9 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const documentRoot = 'C:\\Code\\exp';
-const express = require('express');
-const pify = require('pify');
+import fs from 'fs';
+import path from 'path';
+import express from 'express';
+import pify from 'pify';
+
 const app = express();
+const documentRoot = 'C:\\Code\\exp';
 
 // 处理静态资源请求（这里用作文件下载和图片预览中间件）
 app.use('/static', express.static(documentRoot));
