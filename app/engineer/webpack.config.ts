@@ -11,7 +11,7 @@ export const config = function({ mode }: ConfigOptions): Configuration {
   return {
     mode: mode,
     entry: {
-      app: [ APP_ENTRY_PATH ]
+      app: APP_ENTRY_PATH
     },
     output: {
       filename: isDev ? 'app.js' : 'app.[chuckhash:10].js',
@@ -32,6 +32,6 @@ export const config = function({ mode }: ConfigOptions): Configuration {
           ]
         }
       ]
-    }
+    },
   }
 }
