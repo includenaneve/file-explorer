@@ -3,14 +3,21 @@ import path from 'path';
 import express from 'express';
 import pify from 'pify';
 import { APP_INDEX_ROOT, MANIFEST_PATH } from '../app/engineer/path';
+import { wdm } from './../app/engineer/wdm'
+import { ENV } from './enviment'
 
 const app = express();
 const documentRoot = 'C:\\Code\\exp';
+const IS_DEVELOPMENT = ENV === 'development';
 
 // 处理静态资源请求（这里用作文件下载和图片预览中间件）
 app.use('/static', express.static(documentRoot));
 
-app.use('/assets', express.static(path.resolve(__dirname, '../app/dist')));
+if (IS_DEVELOPMENT) {
+  app.use(wdm());
+} else {
+  app.use('/assets', express.static(path.resolve(__dirname, '../app/dist')));
+}
 
 // 处理目录读取 （这里用作api中间件）
 app.use('/file', async(req, res) => {
@@ -49,7 +56,7 @@ app.use(async(req, res) => {
   const manifest = await pify(fs.readFile)(MANIFEST_PATH, 'utf8');
   const { app } = JSON.parse(manifest);
   const html = await pify(fs.readFile)(APP_INDEX_ROOT, 'utf8');
-  const modifyHTML = html.replace(/%APP_SCRIPT_FLAG%/, `/assets/${app}`);
+  const modifyHTML = html.replace(/%APP_SCRIPT_FLAG%/, `/assets/${IS_DEVELOPMENT ? 'app.js' : app}`);
   res.status(200).send(modifyHTML);
 });
 
