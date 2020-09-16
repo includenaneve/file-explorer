@@ -1,13 +1,16 @@
-import fs from 'fs';
+import fs, { createReadStream } from 'fs';
 import path from 'path';
 import express from 'express';
 import pify from 'pify';
+import { APP_INDEX_ROOT, MANIFEST_PATH } from '../app/engineer/path';
 
 const app = express();
 const documentRoot = 'C:\\Code\\exp';
 
 // 处理静态资源请求（这里用作文件下载和图片预览中间件）
 app.use('/static', express.static(documentRoot));
+
+app.use('/assets', express.static(path.resolve(__dirname, '../app/dist')));
 
 // 处理目录读取 （这里用作api中间件）
 app.use('/file', async(req, res) => {
@@ -23,7 +26,7 @@ app.use('/file', async(req, res) => {
       res.json({ code: 9001, message: 'Not a directory' });
     }
   } catch (err) {
-    res.status(500).end(err.massage)
+    res.status(500).end(err.massage);
     return
   }
 });
@@ -39,8 +42,15 @@ app.use('/async', (req, res) => {
 });
 
 // 直出前端视图
-app.use((req, res) => {
-  res.send('It works!!!');
+app.use(async(req, res) => {
+  // 拿到html文件
+  // 拿到manifest里面的版本号
+  // 替换html里面的js文件
+  const manifest = await pify(fs.readFile)(MANIFEST_PATH, 'utf8');
+  const { app } = JSON.parse(manifest);
+  const html = await pify(fs.readFile)(APP_INDEX_ROOT, 'utf8');
+  const modifyHTML = html.replace(/%APP_SCRIPT_FLAG%/, `/assets/${app}`);
+  res.status(200).send(modifyHTML);
 });
 
 

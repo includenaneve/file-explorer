@@ -1,4 +1,4 @@
-import { Configuration } from 'webpack';
+import webpack, { Configuration } from 'webpack';
 import { APP_ENTRY_PATH, OUTPUT_DIR } from './path';
 
 
@@ -14,7 +14,7 @@ export const config = function({ mode }: ConfigOptions): Configuration {
       app: APP_ENTRY_PATH
     },
     output: {
-      filename: isDev ? 'app.js' : 'app.[chuckhash:10].js',
+      filename: isDev ? 'app.js' : 'app.[chunkhash:10].js',
       path: OUTPUT_DIR,
       publicPath: '/assets',
     },
@@ -33,5 +33,8 @@ export const config = function({ mode }: ConfigOptions): Configuration {
         }
       ]
     },
+    resolve: {
+      extensions: ['.js', '.ts', '.jsx', '.tsx']
+    }
   }
 }

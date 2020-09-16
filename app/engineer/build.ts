@@ -9,11 +9,6 @@ import { config } from './webpack.config';
 import fs from 'fs';
 import { MANIFEST_PATH } from './path';
 
-// interface StatuToJSONResponse {
-//   errors: ToJsonOutput.errors;
-//   assetsByChunkName: ToJsonOutput.assetsByChunkName;
-// }
-
 function build() {
   const prodConfig = config({ mode: 'production' });
   const compiler = webpack(prodConfig);
@@ -24,7 +19,7 @@ function build() {
       /** Returns a formatted string of the compilation information (similar to CLI output). */
       // 这里是为了拿到assetsByChunkName: { app: 'app.[chuckhash:10].js' } 并且把这个写入到文件里面，方便服务器中间件做替换。
       const { errors, assetsByChunkName } = stats.toJson()
-      if (errors) {
+      if (stats.hasErrors()) {
         for (let error of errors) {
           console.error(error);
         }
