@@ -3,7 +3,7 @@ import React from 'react';
 export default function App() {
   return (
     <div>
-      qwdijodqwd
+      你好世界
     </div>
   )
 }

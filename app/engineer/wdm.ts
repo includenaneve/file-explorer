@@ -9,7 +9,6 @@ export const wdm = () => {
   const devMiddleWare = webpackDevMiddleware(compiler, {
     publicPath: devConfig.output?.publicPath
   });
-  console.log(devMiddleWare);
   const hotMiddleWare = webpackHotMiddleware(compiler, {
     // path: './log/hotMiddleWareRecord',
     heartbeat: 1000 * 2

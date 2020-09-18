@@ -1,5 +1,6 @@
 import webpack, { Configuration } from 'webpack';
 import { APP_ENTRY_PATH, OUTPUT_DIR } from './path';
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
 
 export interface ConfigOptions {
@@ -24,7 +25,12 @@ export const config = function({ mode }: ConfigOptions): Configuration {
           test: /\.tsx?$/,
           loaders: [
             {
-              loader: 'babel-loader'
+              loader: 'babel-loader',
+              options: {
+                plugins: [
+                  isDev && require.resolve('react-refresh/babel')
+                ].filter(Boolean),
+              }
             },
             {
               loader: 'ts-loader'
@@ -38,8 +44,9 @@ export const config = function({ mode }: ConfigOptions): Configuration {
     },
     plugins: [
       // perferEntry ???
-      new webpack.optimize.OccurrenceOrderPlugin(false),
-      new webpack.HotModuleReplacementPlugin(),
-    ]
+      isDev && new webpack.optimize.OccurrenceOrderPlugin(false),
+      isDev && new webpack.HotModuleReplacementPlugin(),
+      isDev && new ReactRefreshWebpackPlugin()
+    ].filter(Boolean)
   }
 }
