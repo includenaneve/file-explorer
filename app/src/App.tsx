@@ -1,9 +1,10 @@
 import React from 'react';
+import { Button } from 'antd';
 
 export default function App() {
   return (
     <div>
-      你好世界
+      <Button type="primary">你好世界</Button>
     </div>
   )
 }
